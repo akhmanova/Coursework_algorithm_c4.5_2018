@@ -26,13 +26,16 @@ def read_data(dataset, datafile, datatypes):
     f = open(datafile)
     original_file = f.read()
     rowsplit_data = original_file.splitlines()
-    dataset.examples = [rows.split(',') for rows in rowsplit_data]
+    dataset.examples = [
+      rows.split(',') for rows in rowsplit_data
+    ]
 
     #list attributes
     dataset.attributes = dataset.examples.pop(0)
 
     
-    #create array that indicates whether each attribute is a numerical value or not
+    #create array that indicates whether each attribute
+     is a numerical value or not
     attr_type = open(datatypes) 
     orig_file = attr_type.read()
     dataset.attr_types = orig_file.split(',')
@@ -43,17 +46,22 @@ def read_data(dataset, datafile, datatypes):
 def preprocess2(dataset):
     print "Preprocessing data..."
 
-    class_values = [example[dataset.class_index] for example in dataset.examples]
+    class_values = [example[dataset.class_index] for example 
+      in dataset.examples]
     class_mode = Counter(class_values)
     class_mode = class_mode.most_common(1)[0][0]
                          
     for attr_index in range(len(dataset.attributes)):
 
-        ex_0class = filter(lambda x: x[dataset.class_index] == '0', dataset.examples)
-        values_0class = [example[attr_index] for example in ex_0class]  
+        ex_0class = filter(lambda x: x[dataset.class_index] 
+          == '0', dataset.examples)
+        values_0class = [example[attr_index] 
+          for example in ex_0class]  
                            
-        ex_1class = filter(lambda x: x[dataset.class_index] == '1', dataset.examples)
-        values_1class = [example[attr_index] for example in ex_1class]
+        ex_1class = filter(lambda x: x[dataset.class_index]
+           == '1', dataset.examples)
+        values_1class = [example[attr_index]
+           for example in ex_1class]
                 
         values = Counter(values_0class)
         value_counts = values.most_common()
@@ -92,7 +100,9 @@ def preprocess2(dataset):
 # tree node class (attr_split_idx -- bool)
 ##################################################
 class treeNode():
-    def __init__(self, is_leaf, classification, attr_split_index, attr_split_value, parent, upper_child, lower_child, height):
+    def __init__(self, is_leaf, classification, 
+      attr_split_index, attr_split_value, parent, 
+      upper_child, lower_child, height):
         self.is_leaf = True
         self.classification = None
         self.attr_split = None
@@ -107,18 +117,7 @@ class treeNode():
 # compute tree
 ##################################################
 {
-# initialize Tree
-    # if dataset is pure or  stopping then stop
-    # for all attributes a in dataset
-        # compute information-theoretic criteria if we split on a
-    # abest = best attribute according to above
-    # tree = create a decision node that tests abest in the root
-    # dv (v=1,2,3,...) = induced sub-datasets from D based on abest
-    # for all dv
-        # tree = compute_tree(dv)
-        # attach tree to the corresponding branch of Tree
-    # return tree 
-}
+
 def compute_tree(dataset, parent_node, classifier):
     node = treeNode(True, None, None, None, parent_node, None, None, 0)
     if (parent_node == None):
@@ -149,7 +148,8 @@ def compute_tree(dataset, parent_node, classifier):
         if (dataset.attributes[attr_index] != classifier):
             local_max_gain = 0
             local_split_val = None
-            attr_value_list = [example[attr_index] for example in dataset.examples]
+            attr_value_list = [example[attr_index] 
+            for example in dataset.examples]
             attr_value_list = list(set(attr_value_list))
             if(len(attr_value_list) > 100):
                 attr_value_list = sorted(attr_value_list)
@@ -161,7 +161,8 @@ def compute_tree(dataset, parent_node, classifier):
                 attr_value_list = new_list
 
             for val in attr_value_list:
-                local_gain = calc_gain(dataset, dataset_entropy, val, attr_index)
+                local_gain = calc_gain(dataset, 
+                  dataset_entropy, val, attr_index)
   
                 if (local_gain > local_max_gain):
                     local_max_gain = local_gain
@@ -173,7 +174,7 @@ def compute_tree(dataset, parent_node, classifier):
                 attr_to_split = attr_index
 
     if (split_val is None or attr_to_split is None):
-        print "Something went wrong. Couldn't find an attribute to split on (or a split value)."
+        print "Something went wrong."
     elif (max_gain <= min_gain or node.height > 20):
 
         node.is_leaf = True
@@ -192,7 +193,8 @@ def compute_tree(dataset, parent_node, classifier):
     upper_dataset.attr_types = dataset.attr_types
     lower_dataset.attr_types = dataset.attr_types
     for example in dataset.examples:
-        if (attr_to_split is not None and example[attr_to_split] >= split_val):
+        if (attr_to_split is not None and example[attr_to_split]
+         >= split_val):
             upper_dataset.examples.append(example)
         elif (attr_to_split is not None):
             lower_dataset.examples.append(example)
@@ -206,7 +208,8 @@ def compute_tree(dataset, parent_node, classifier):
 # Classify dataset
 ##################################################
 def classify_leaf(dataset, classifier):
-    ones = one_count(dataset.examples, dataset.attributes, classifier)
+    ones = one_count(dataset.examples, dataset.attributes, 
+      classifier)
     total = len(dataset.examples)
     zeroes = total - ones
     if (ones >= zeroes):
@@ -218,7 +221,8 @@ def classify_leaf(dataset, classifier):
 # Calculate the entropy
 ##################################################
 def calc_dataset_entropy(dataset, classifier):
-    ones = one_count(dataset.examples, dataset.attributes, classifier)
+    ones = one_count(dataset.examples, dataset.attributes, 
+      classifier)
     total_examples = len(dataset.examples);
 
     entropy = 0
@@ -251,13 +255,16 @@ def calc_gain(dataset, entropy, val, attr_index):
         elif (example[attr_index] < val):
             gain_lower_dataset.examples.append(example)
 
-    if (len(gain_upper_dataset.examples) == 0 or len(gain_lower_dataset.examples) == 0):
+    if (len(gain_upper_dataset.examples) == 0 or 
+      len(gain_lower_dataset.examples) == 0):
         return -1
 
     attr_entropy += calc_dataset_entropy(gain_upper_dataset,
-                                         classifier)*len(gain_upper_dataset.examples)/total_examples
+      classifier)*len(gain_upper_dataset.examples)
+      /total_examples
     attr_entropy += calc_dataset_entropy(gain_lower_dataset,
-                                         classifier)*len(gain_lower_dataset.examples)/total_examples
+      classifier)*len(gain_lower_dataset.examples)
+      /total_examples
 
     return entropy - attr_entropy
 
@@ -298,10 +305,12 @@ def prune_tree(root, node, dataset, best_score):
             node.parent.classification = None
             return best_score
     else:
-        new_score = prune_tree(root, node.upper_child, dataset, best_score)
+        new_score = prune_tree(root, node.upper_child,
+         dataset, best_score)
         if (node.is_leaf == True):
             return new_score
-        new_score = prune_tree(root, node.lower_child, dataset, new_score)
+        new_score = prune_tree(root, node.lower_child,
+         dataset, new_score)
         if (node.is_leaf == True):
             return new_score
 
@@ -341,10 +350,13 @@ def test_example(example, node, class_index):
     if (node.is_leaf == True):
         return node.classification
     else:
-        if (example[node.attr_split_index] >= node.attr_split_value):
-            return test_example(example, node.upper_child, class_index)
+        if (example[node.attr_split_index] >=
+         node.attr_split_value):
+            return test_example(example, node.upper_child, 
+              class_index)
         else:
-            return test_example(example, node.lower_child, class_index)
+            return test_example(example, node.lower_child, 
+              class_index)
 
 ##################################################
 # Print tree
@@ -378,9 +390,13 @@ def print_disjunctive(node, dataset, dnf_string):
         else:
             return
     else:
-        upper = dnf_string + str(dataset.attributes[node.attr_split_index]) + " >= " + str(node.attr_split_value) + " V "
+        upper = dnf_string + 
+        str(dataset.attributes[node.attr_split_index])
+         + " >= " + str(node.attr_split_value) + " V "
         print_disjunctive(node.upper_child, dataset, upper)
-        lower = dnf_string + str(dataset.attributes[node.attr_split_index]) + " < " + str(node.attr_split_value) + " V "
+        lower = dnf_string + 
+        str(dataset.attributes[node.attr_split_index]) 
+        + " < " + str(node.attr_split_value) + " V "
         print_disjunctive(node.lower_child, dataset, lower)
         return
 
@@ -415,7 +431,8 @@ def main():
             if dataset.attributes[a] == dataset.classifier:
                 dataset.class_index = a
             else:
-                dataset.class_index = range(len(dataset.attributes))[-1]
+                dataset.class_index =
+                 range(len(dataset.attributes))[-1]
                 
         unprocessed = copy.deepcopy(dataset)
         preprocess2(dataset)
@@ -432,20 +449,25 @@ def main():
             validateset = data(classifier)
             read_data(validateset, datavalidate, datatypes)
             for a in range(len(dataset.attributes)):
-                if validateset.attributes[a] == validateset.classifier:
+                if validateset.attributes[a] == 
+                validateset.classifier:
                     validateset.class_index = a
                 else:
-                    validateset.class_index = range(len(validateset.attributes))[-1]
+                    validateset.class_index =
+                     range(len(validateset.attributes))[-1]
             preprocess2(validateset)
             best_score = validate_tree(root, validateset)
             all_ex_score = copy.deepcopy(best_score)
-            print "Initial (pre-pruning) validation set score: " + str(100*best_score) +"%"
+            print "Initial (pre-pruning) validation set score: "
+             + str(100*best_score) +"%"
         if ("-p" in args):
             if("-v" not in args): # must be with each other
                 print "Error: You must validate if you want to prune"
             else:
-                post_prune_accuracy = 100*prune_tree(root, root, validateset, best_score)
-                print "Post-pruning score on validation set: " + str(post_prune_accuracy) + "%"
+                post_prune_accuracy = 100*prune_tree(root, root, 
+                  validateset, best_score)
+                print "Post-pruning score on validation set: " + 
+                str(post_prune_accuracy) + "%"
         if ("-t" in args):
             datatest = args[args.index("-t") + 1]
             testset = data(classifier)
@@ -454,7 +476,8 @@ def main():
                 if testset.attributes[a] == testset.classifier:
                     testset.class_index = a
                 else:
-                    testset.class_index = range(len(testset.attributes))[-1]
+                    testset.class_index = 
+                    range(len(testset.attributes))[-1]
             print "Testing model on " + str(datatest)
             for example in testset.examples:
                 example[testset.class_index] = '0'
@@ -465,7 +488,8 @@ def main():
             b = open('results.csv', 'w')
             a = csv.writer(b)
             for example in testset.examples:
-                example[testset.class_index] = test_example(example, root, testset.class_index)
+                example[testset.class_index] =
+                 test_example(example, root, testset.class_index)
             saveset = testset
             saveset.examples = [saveset.attributes] + saveset.examples
             a.writerows(saveset.examples)

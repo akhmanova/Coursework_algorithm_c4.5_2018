@@ -458,7 +458,8 @@ class data:
     	#list attributes
     	dataset.attributes = dataset.examples.pop(0)
 
-	    #create array that indicates whether each attribute is a numerical value or not
+	    #create array that indicates whether
+	    # each attribute is a numerical value or not
    	 attr_type = open(datatypes) 
     	orig_file = attr_type.read()
     	dataset.attr_types = orig_file.split(',')
@@ -649,10 +650,12 @@ def prune_tree(root, node, dataset, best_score):
             node.parent.classification = None
             return best_score
     else:
-        new_score = prune_tree(root, node.upper_child, dataset, best_score)
+        new_score = prune_tree(root, node.upper_child,
+         	dataset, best_score)
         if (node.is_leaf == True):
             return new_score
-        new_score = prune_tree(root, node.lower_child, dataset, new_score)
+        new_score = prune_tree(root, node.lower_child, 
+        		dataset, new_score)
         if (node.is_leaf == True):
             return new_score
         return new_score
